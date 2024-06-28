@@ -4,6 +4,7 @@
 #include <stdexcept>
 #include <unordered_set>
 #include "Node.hpp"
+#include <iostream>
 using namespace std;
 
 // bfs_iterator
@@ -31,7 +32,7 @@ public:
         }
         catch (const exception &e)
         {
-            std::cerr << e.what() << '\n';
+            cerr << e.what() << '\n';
         }
     }
     BFSIterator<T> &operator++()
@@ -91,7 +92,7 @@ public:
         }
         catch (const exception &e)
         {
-            std::cerr << e.what() << '\n';
+            cerr << e.what() << '\n';
         }
     }
 
@@ -245,7 +246,7 @@ public:
         }
         catch (const exception &e)
         {
-            std::cerr << e.what() << '\n';
+            cerr << e.what() << '\n';
         }
     }
 
@@ -304,44 +305,38 @@ public:
     }
 };
 
-// in_order_iterator
+
+// In-order iterator
 template <typename T>
-class in_oreder_iterator
-{
+class in_order_iterator {
 private:
-    stack<Node<T> *> nodeStack;
-    Node<T> *current;
+    std::stack<Node<T>*> nodeStack;
+    Node<T>* current;
 
 public:
-    in_oreder_iterator(Node<T> *root) : current(root)
-    {
-        if (root)
-        {
-            nodeStack.push(root);
+    in_order_iterator(Node<T>* root) : current(root) {
+        push_most_left_child(root);
+    }
+
+    // Consider returning a sentinel value (e.g., nullptr) for end of iteration
+    T* operator*() const {
+        return current;
+    }
+
+    void push_most_left_child(Node<T>* node) {
+        while (node) {
+            nodeStack.push(node);
+            node = node->children.empty() ? nullptr : node->children.front().get();
         }
     }
 
-    T &operator*()
-    {
-        try
-        {
-            return current->value;
-        }
-        catch (const exception &e)
-        {
-            std::cerr << e.what() << '\n';
-        }
-    }
-
-
-    in_oreder_iterator<T> &operator++()
-    {
-        if (!nodeStack.empty())
-        {
-            Node<T> *node = nodeStack.top();
+    in_order_iterator<T>& operator++() {
+        if (!nodeStack.empty()) {
+            current = nodeStack.top();
             nodeStack.pop();
 
-            if (current->children.size() > 2) // if the tree is more than a binary tree i.e k-ary tree where as k>2 we will do dfs
+            if (current->children.size() > 1) {
+               // if the tree is more than a binary tree i.e k-ary tree where as k>2 we will do dfs
             {
                 for (auto it = node->childrens.rbegin(); it != node->childrens.rend(); ++it)
                 {
@@ -360,20 +355,16 @@ public:
                     current = nullptr;
                 }
             }
-            else // if the tree is a binary tree
-            {
-                if(current->children.at(0)) // if the left child exists      
-                {
-                    nodeStack.push(current->children.at(0).get());
-                }
-                
+            } else if (current->children.front()) { // Check for right child (binary tree)
+                push_most_left_child(current->children.front().get());
             }
+            current = nodeStack.empty() ? nullptr : nodeStack.top();
         }
         return *this;
     }
 
-    bool operator!=(const in_oreder_iterator &other) const
-    {
-        return (current != other.current);
+    bool operator!=(const in_order_iterator<T>& other) const {
+        return current != other.current;
     }
 };
+
