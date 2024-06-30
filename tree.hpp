@@ -27,38 +27,38 @@ private:
 public:
     tree(int k = 2) : root(nullptr), k(k) {}
 
-    void add_root(T val)
+    void add_root(Node<T>* val)
     {
-        if (root != NULL)
+        if (root != nullptr)
         {
             throw invalid_argument("Root already exists");
         }
         root = new Node<T>(val, 0);
     }
-    void add_sub_node(T parent, T child)
-    {
-        if (child == NULL)
+        void add_sub_node(Node<T>* parent,Node<T>* child)
         {
-            return; // if there is no child nothing to do
+            if (child == nullptr)
+            {
+                return; // if there is no child nothing to do
+            }
+            else if (parent->childrens.size() >= (size_t)k)
+            {
+                throw invalid_argument("Parent has max childrens");
+            }
+            else if (parent == nullptr)
+            { // if there is no parent throw exception cause its invalid
+                throw invalid_argument("Parent doesn't exist");
+            }
+            else if (root == nullptr)
+            { // if there is no root make the parent the root and the child the root's child
+                add_root(parent);
+                add_sub_node(parent, child);
+            }
+            else
+            {
+                parent->childrens.emplace_back(make_unique<Node<T>>(child, k)); // add the child to the parent's childrens
+            }
         }
-        else if (parent->childrens.size() >= k)
-        {
-            throw invalid_argument("Parent has max childrens");
-        }
-        else if (parent == NULL)
-        { // if there is no parent throw exception cause its invalid
-            throw invalid_argument("Parent doesn't exist");
-        }
-        else if (root == NULL)
-        { // if there is no root make the parent the root and the child the root's child
-            add_root(parent);
-            add_sub_node(parent, child);
-        }
-        else
-        {
-            parent->childrens.emplace_back(make_unique<Node<T>>(child, k)); // add the child to the parent's childrens
-        }
-    }
     int getK()
     {
         return k;
@@ -118,10 +118,19 @@ public:
         {
             prev = it;
             ++it;
-            prev->remove_children();
+            remove_children(prev.get_current());
         }
         root = nullptr;
     }
+    void remove_children(Node<T> *node)
+    {
+        for (auto &child : node->children)
+        {
+            remove_children(child.get());
+        }
+        node->children.clear();
+    }
+   
     // Template function to draw the tree nodes and edges
     void drawTreeNodes_Edges(sf::RenderWindow &window, Node<T> *node, sf::Vector2f position, float horizontalSpacing, float verticalSpacing)
     {

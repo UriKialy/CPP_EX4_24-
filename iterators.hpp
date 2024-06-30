@@ -24,6 +24,9 @@ public:
             nodeQueue.push(root);
         }
     }
+        Node<T>*get_current(){
+        return current;
+    }
 
     T &operator*()
     {
@@ -84,6 +87,9 @@ public:
         {
             nodeStack.push(root);
         }
+    }
+    Node<T>*get_current(){
+        return current;
     }
 
     T &operator*()
@@ -160,6 +166,14 @@ public:
         nodeQueue.pop_front();
         return current;
     }
+    void push_most_left_child(Node<T> *node)
+    {
+        while (node)
+        {
+            nodeQueue.push_front(node);
+            node = node->childrens.empty() ? nullptr : node->childrens.front().get();
+        }
+    }
     post_order_iterator<T> &operator++()
     {
         if (k > 2) // if the tree is more than a binary tree i.e k-ary tree where as k>2 we will do dfs
@@ -195,7 +209,7 @@ public:
                     Node<T> *parent = nodeQueue.front();
                     if (parent->childrens.size() > 1 && node == parent->childrens.at(0).get())
                     {
-                        pushLeftmostPath(parent->childrens[1].get());
+                        push_most_left_child(parent->childrens[1].get());
                     }
                 }
                 current = node;
@@ -207,6 +221,7 @@ public:
         }
         return *this;
     }
+
     T &operator*()
     {
         try
@@ -218,9 +233,12 @@ public:
             cerr << e.what() << '\n';
         }
     }
-        bool operator!=(const post_order_iterator &other) const
+    bool operator!=(const post_order_iterator &other) const
     {
         return (current != other.current);
+    }
+        Node<T>*get_current(){
+        return current;
     }
 
 private:
@@ -284,7 +302,6 @@ private:
             }
         }
     }
-
 };
 
 // Pre-order iterator
@@ -303,6 +320,9 @@ public:
         {
             nodeStack.push(root);
         }
+    }
+        Node<T>*get_current(){
+        return current;
     }
 
     T &operator*()
@@ -386,9 +406,12 @@ public:
     {
         push_most_left_child(root);
     }
-        bool operator!=(const in_order_iterator &other) const
+    bool operator!=(const in_order_iterator &other) const
     {
         return current != other.current;
+    }
+        Node<T>*get_current(){
+        return current;
     }
 
     // Consider returning a sentinel value (e.g., nullptr) for end of iteration
@@ -450,6 +473,4 @@ public:
         }
         return *this;
     }
-
-
 };
