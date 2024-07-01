@@ -17,6 +17,7 @@ public:
     Complex operator*(const Complex &other) const;
     Complex operator/(const Complex &other) const;
     bool operator==(const Complex &other) const;
+    bool operator >(const Complex &other) const;
     bool operator!=(const Complex &other) const;
     std::string to_string(Complex &c) const;
     friend std::ostream &operator<<(std::ostream &out, const Complex &c);

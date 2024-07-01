@@ -27,117 +27,120 @@ private:
 public:
     tree(int k = 2) : root(nullptr), k(k) {}
 
-    void add_root(Node<T>* val)
+    void add_root(Node<T> *val)
     {
         if (root != nullptr)
         {
             throw invalid_argument("Root already exists");
         }
-        root = new Node<T>(val, 0);
+        root = val;
     }
-        void add_sub_node(Node<T>* parent,Node<T>* child)
+    void add_sub_node(Node<T> *parent, Node<T> *child)
+    {
+        if (child == nullptr)
         {
-            if (child == nullptr)
-            {
-                return; // if there is no child nothing to do
-            }
-            else if (parent->childrens.size() >= (size_t)k)
-            {
-                throw invalid_argument("Parent has max childrens");
-            }
-            else if (parent == nullptr)
-            { // if there is no parent throw exception cause its invalid
-                throw invalid_argument("Parent doesn't exist");
-            }
-            else if (root == nullptr)
-            { // if there is no root make the parent the root and the child the root's child
-                add_root(parent);
-                add_sub_node(parent, child);
-            }
-            else
-            {
-                parent->childrens.emplace_back(make_unique<Node<T>>(child, k)); // add the child to the parent's childrens
-            }
+            cout << "child is null" << endl;
+            return; // if there is no child nothing to do
         }
+        if (parent->childrens.size() >= (size_t)k)
+        {
+            throw invalid_argument("Parent has max childrens");
+        }
+        if (parent == nullptr)
+        { // if there is no parent throw exception cause its invalid
+            throw invalid_argument("Parent doesn't exist");
+        }
+        if (root == nullptr)
+        {
+            throw invalid_argument("root doesn't exist");
+        }
+        else
+        {
+            parent->childrens.emplace_back(child); // add the child to the parent's childrens
+        }
+    }
     int getK()
     {
         return k;
     }
-    pre_order_iterator<T > begin_pre_order()
+    pre_order_iterator<T> begin_pre_order()
     {
-        return pre_order_iterator<T>(root,k);
+        return pre_order_iterator<T>(root, k);
     }
     pre_order_iterator<T> end_pre_order()
     {
-        return pre_order_iterator<T>(nullptr,k);
+        return pre_order_iterator<T>(nullptr, k);
     }
     post_order_iterator<T> begin_post_order()
     {
-        return post_order_iterator<T>(root,k);
+        return post_order_iterator<T>(root, k);
     }
     post_order_iterator<T> end_post_order()
     {
-        return post_order_iterator<T>(nullptr,k);
+        return post_order_iterator<T>(nullptr, k);
     }
 
     in_order_iterator<T> begin_in_order()
     {
-        return in_order_iterator<T>(root,k);
+        return in_order_iterator<T>(root, k);
     }
 
     in_order_iterator<T> end_in_order()
     {
-        return in_order_iterator<T>(nullptr,k);
+        return in_order_iterator<T>(nullptr, k);
     }
 
     dfs_iterator<T> begin_dfs_scan()
     {
-        return dfs_iterator<T>(root,k);
+        return dfs_iterator<T>(root, k);
     }
 
     dfs_iterator<T> end_dfs_scan()
     {
-        return dfs_iterator<T>(nullptr,k);
+        return dfs_iterator<T>(nullptr, k);
     }
 
     BFSIterator<T> begin_bfs_scan()
     {
-        return BFSIterator<T>(root,k);
+        return BFSIterator<T>(root, k);
     }
 
     BFSIterator<T> end_bfs_scan()
     {
-        return BFSIterator<T>(nullptr,k);
+        return BFSIterator<T>(nullptr, k);
     }
+    HeapIterator<T> begin_heap_scan()
+    {
+        return HeapIterator<T>(root, k);
+    }
+    HeapIterator<T> end_heap_scan()
+    {
+        return HeapIterator<T>(nullptr, k);
+    }
+
     ~tree()
     {
-        BFSIterator<T> it = begin_bfs_scan();
-        BFSIterator<T> prev = it;
-        BFSIterator<T> end = end_bfs_scan();
+        dfs_iterator<T> it = begin_dfs_scan();
+        dfs_iterator<T> prev = it;
+        dfs_iterator<T> end = end_dfs_scan();
         while (it != end)
         {
+            cout<<"deleting node with value: "<<*it<<endl;
             prev = it;
             ++it;
-            remove_children(prev.get_current());
+            //prev.get_current()->remove_childrens();
         }
         root = nullptr;
     }
-    void remove_children(Node<T> *node)
-    {
-        for (auto &child : node->children)
-        {
-            remove_children(child.get());
-        }
-        node->children.clear();
-    }
-   
+    
+
     // Template function to draw the tree nodes and edges
     void drawTreeNodes_Edges(sf::RenderWindow &window, Node<T> *node, sf::Vector2f position, float horizontalSpacing, float verticalSpacing)
     {
         if (!node)
             return;
 
-        int childSize = node->children.size();
+        int childSize = node->childrens.size();
         float startAngle = -90.0f - (childSize - 1) * 15.0f;
         sf::CircleShape circle(20);
         circle.setFillColor(sf::Color(100, 100, 255));
@@ -165,10 +168,9 @@ public:
         text.setPosition(position);
         window.draw(text);
 
-
         for (int i = 0; i < childSize; ++i)
         {
-            auto &child = node->children.at(i);
+            auto &child = node->childrens.at(i);
             if (child)
             {
                 float angle = startAngle + i * 30.0f;
@@ -195,7 +197,7 @@ public:
         else
         {
             int hight = 0;
-            for (auto &child : node->children)
+            for (auto &child : node->childrens)
             {
                 hight = max(hight, calcHight(child.get()));
             }
@@ -227,7 +229,7 @@ public:
         drawTreeNodes_Edges(window, root, startPosition, horizontalSpacing, verticalSpacing);
     }
 
-    bool  operator!=(const tree<T> &other) const
+    bool operator!=(const tree<T> &other) const
     {
         return (root != other.root);
     }

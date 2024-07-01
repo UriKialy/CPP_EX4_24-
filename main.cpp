@@ -12,21 +12,22 @@ int main()
 {
     // Create a binary tree with integers
     tree<int> binaryTree(2);
+    Node<int> *root = new Node<int>(555);
+    Node<int> *node1 = new Node<int>(1);
+    Node<int> *node2 = new Node<int>(2);
+    Node<int> *node3 = new Node<int>(3);
+    Node<int> *node4 = new Node<int>(4);
+    Node<int> *node5 = new Node<int>(5);
+    Node<int> *node6 = new Node<int>(6);
+    Node<int> *node7 = new Node<int>(7);
 
-    binaryTree.add_root(1);
-    Node<int> *node1 = new Node<int>(1, 2);
-    Node<int> *node2 = new Node<int>(2, 2);
-    Node<int> *node3 = new Node<int>(3, 2);
-    Node<int> *node4 = new Node<int>(4, 2);
-    Node<int> *node5 = new Node<int>(5, 2);
-    Node<int> *node6 = new Node<int>(6, 2);
-    Node<int> *node7 = new Node<int>(7, 2);
-
-    binaryTree.add_sub_node(node1, node2);
+    binaryTree.add_root(root);
+    binaryTree.add_sub_node(root, node2);
+    binaryTree.add_sub_node(root, node1);
     binaryTree.add_sub_node(node1, node3);
-    binaryTree.add_sub_node(node2, node4);
+    binaryTree.add_sub_node(node1, node4);
     binaryTree.add_sub_node(node2, node5);
-    binaryTree.add_sub_node(node3, node6);
+    binaryTree.add_sub_node(node2, node6);
     binaryTree.add_sub_node(node3, node7);
 
     cout << "Pre-order Traversal (Binary Tree): ";
@@ -67,15 +68,16 @@ int main()
     // Create a binary tree with complex numbers
     tree<Complex> binaryComplexTree(2);
 
-    binaryComplexTree.add_root(Complex(1, 1));
-    Node<Complex> *nodeC1 = new Node<Complex>(Complex(1, 1), 2);
-    Node<Complex> *nodeC2 = new Node<Complex>(Complex(2, 2), 2);
-    Node<Complex> *nodeC3 = new Node<Complex>(Complex(3, 3), 2);
-    Node<Complex> *nodeC4 = new Node<Complex>(Complex(4, 4), 2);
-    Node<Complex> *nodeC5 = new Node<Complex>(Complex(5, 5), 2);
-    Node<Complex> *nodeC6 = new Node<Complex>(Complex(6, 6), 2);
-    Node<Complex> *nodeC7 = new Node<Complex>(Complex(7, 7), 2);
+    Node<Complex> *ComplexRoot = new Node<Complex>(Complex(1, 1));
+    Node<Complex> *nodeC1 = new Node<Complex>(Complex(1, 2));
+    Node<Complex> *nodeC2 = new Node<Complex>(Complex(2, 2));
+    Node<Complex> *nodeC3 = new Node<Complex>(Complex(3, 3));
+    Node<Complex> *nodeC4 = new Node<Complex>(Complex(4, 4));
+    Node<Complex> *nodeC5 = new Node<Complex>(Complex(5, 5));
+    Node<Complex> *nodeC6 = new Node<Complex>(Complex(6, 6));
+    Node<Complex> *nodeC7 = new Node<Complex>(Complex(7, 7));
 
+    binaryComplexTree.add_root(ComplexRoot);
     binaryComplexTree.add_sub_node(nodeC1, nodeC2);
     binaryComplexTree.add_sub_node(nodeC1, nodeC3);
     binaryComplexTree.add_sub_node(nodeC2, nodeC4);
@@ -122,18 +124,20 @@ int main()
     tree<int> threeAryTree(3);
     // Tree<Complex> binaryComplexTree;
 
-    threeAryTree.add_root(1);
-    Node<int>* nodeT1 = new Node<int>(1, 3);
-    Node<int>* nodeT2 = new Node<int>(2, 3);
-    Node<int>* nodeT3 = new Node<int>(3, 3);
-    Node<int>* nodeT4 = new Node<int>(4, 3);
-    Node<int>* nodeT5 = new Node<int>(5, 3);
-    Node<int>* nodeT6 = new Node<int>(6, 3);
-    Node<int>* nodeT7 = new Node<int>(7, 3);
-    Node<int>* nodeT8 = new Node<int>(8, 3);
-    Node<int>* nodeT9 = new Node<int>(9, 3);
-    Node<int>* nodeT10 = new Node<int>(10, 3);
+    
+    Node<int> *Troot = new Node<int>(1);
+    Node<int> *nodeT1 = new Node<int>(1);
+    Node<int> *nodeT2 = new Node<int>(2);
+    Node<int> *nodeT3 = new Node<int>(3);
+    Node<int> *nodeT4 = new Node<int>(4);
+    Node<int> *nodeT5 = new Node<int>(5);
+    Node<int> *nodeT6 = new Node<int>(6);
+    Node<int> *nodeT7 = new Node<int>(7);
+    Node<int> *nodeT8 = new Node<int>(8);
+    Node<int> *nodeT9 = new Node<int>(9);
+    Node<int> *nodeT10 = new Node<int>(10);
 
+    threeAryTree.add_root(Troot);
     threeAryTree.add_sub_node(nodeT1, nodeT2);
     threeAryTree.add_sub_node(nodeT1, nodeT3);
     threeAryTree.add_sub_node(nodeT1, nodeT4);

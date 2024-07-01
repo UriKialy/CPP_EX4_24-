@@ -14,10 +14,8 @@ class Node
 public:
     T value;
     vector<unique_ptr<Node<T>>> childrens;
-
-    Node(T val, int k) : value(val), childrens(k) {
-        if(k < 0) {
-            throw invalid_argument("Number of childrens must be non-negative");
-        }
+    Node(T val) : value(val) { }
+        void remove_childrens() {
+        childrens.clear();
     }
 };

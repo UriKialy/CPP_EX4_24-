@@ -1,6 +1,6 @@
 # Define the compiler and compiler flags
 CXX = g++
-CXXFLAGS = -g -std=c++14 -Wall -Wextra -I. Wno-Comment
+CXXFLAGS = -g -std=c++14 -Wall -Wextra -I. -Wno-comment
 
 # Define the target executable for the main program
 TREE = tree
@@ -9,16 +9,16 @@ TREE = tree
 TEST = test
 
 # Define the source files for the main program
-SRCS = main.cpp complex.cpp
+SRCS = main.cpp Complex.cpp
 
 # Define the source files for the tests
-TEST_SRCS = test.cpp complex.cpp
+TEST_SRCS = test.cpp Complex.cpp
 
 # Define the object files for the main program
-OBJS = $(SRCS:.cpp=.o)
+OBJS = main.o complex.o
 
 # Define the object files for the tests
-TEST_OBJS = $(TEST_SRCS:.cpp=.o)
+TEST_OBJS = test.o complex.o
 
 # Default target to build the main program
 all: $(TREE) $(TEST)
@@ -31,9 +31,15 @@ $(TREE): $(OBJS)
 $(TEST): $(TEST_OBJS)
 	$(CXX) $(CXXFLAGS) -o $(TEST) $(TEST_OBJS)
 
-# Rule to build object files from source files for the main program
-%.o: %.cpp
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+# Rule to build object files from source files
+main.o: main.cpp
+	$(CXX) $(CXXFLAGS) -c main.cpp -o main.o
+
+complex.o: Complex.cpp
+	$(CXX) $(CXXFLAGS) -c Complex.cpp -o complex.o
+
+test.o: test.cpp
+	$(CXX) $(CXXFLAGS) -c test.cpp -o test.o
 
 # Rule to clean up the build artifacts
 clean:
