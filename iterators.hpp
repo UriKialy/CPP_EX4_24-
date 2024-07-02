@@ -5,74 +5,87 @@
 #include <unordered_set>
 #include "Node.hpp"
 #include <iostream>
+#include <vector>
+#include <algorithm>
+#include <deque>
+
 using namespace std;
 
-// bfs_iterator
+// BFS iterator
 template <typename T>
 class BFSIterator
 {
 private:
-    queue<Node<T> *> nodeQueue;
-    Node<T> *current;
-    int k;
+    queue<Node<T> *> NodeQueue;
 
 public:
-    BFSIterator(Node<T> *root, int k) : current(root), k(k)
+    BFSIterator(Node<T> *root, int k)
     {
-        if (root)
+        if (root != nullptr)
         {
-            nodeQueue.push(root);
+            NodeQueue.push(root);
         }
     }
-    Node<T> *get_current()
-    {
-        return current;
-    }
-
-    T &operator*()
+    T &operator*() const
     {
         try
         {
-            return current->value;
+            return NodeQueue.front()->value;
         }
-        catch (const exception &e)
+        catch (const std::exception &e)
         {
-            cerr << e.what() << '\n';
+            cout << e.what() << endl;
         }
     }
-    BFSIterator<T> &operator++()
+
+    Node<T> *operator->() const
     {
-        if (!nodeQueue.empty())
+        return NodeQueue.front();
+    }
+
+    BFSIterator &operator++()
+    {
+        if (!NodeQueue.empty())
         {
-            Node<T> *node = nodeQueue.front();
-            nodeQueue.pop();
-
-            for (auto &child : node->childrens)
+            Node<T> *current = NodeQueue.front();
+            NodeQueue.pop();
+            while (current == nullptr && !NodeQueue.empty())
             {
-                if (child)
+                current = NodeQueue.front();
+                NodeQueue.pop();
+            }
+            for (size_t i = 0; i < current->childrens.size(); ++i)
+            {
+                if (current->childrens[(size_t)i] != nullptr)
                 {
-                    nodeQueue.push(child.get());
+                    NodeQueue.push(current->childrens[(size_t)i].get());
                 }
-            }
-
-            if (!nodeQueue.empty())
-            {
-                current = nodeQueue.front();
-            }
-            else
-            {
-                current = nullptr;
             }
         }
         return *this;
     }
+    bool operator==(const BFSIterator &other) const
+    {
+        bool bothEmpty = NodeQueue.empty() && other.NodeQueue.empty();
+        bool bothNotEmpty = !NodeQueue.empty() && !other.NodeQueue.empty();
+        bool frontEqual = NodeQueue.front() == other.NodeQueue.front();
+        
+        return bothEmpty || (bothNotEmpty && frontEqual);
+    }
+    BFSIterator operator++(int)
+    {
+        BFSIterator tmp = *this;
+        ++(*this);
+        return tmp;
+    }
+
     bool operator!=(const BFSIterator &other) const
     {
-        return current != other.current;
+        return !(*this == other);
     }
 };
 
-// dfs_iterator
+// DFS iterator
 template <typename T>
 class dfs_iterator
 {
@@ -89,46 +102,34 @@ public:
             nodeStack.push(root);
         }
     }
-    Node<T> *get_current()
+
+    Node<T> *operator->() const
     {
         return current;
     }
 
     T &operator*()
     {
-        try
-        {
-            return current->value;
-        }
-        catch (const exception &e)
-        {
-            cerr << e.what() << '\n';
-        }
+        return current->value;
     }
 
     dfs_iterator<T> &operator++()
     {
         if (!nodeStack.empty())
         {
-            Node<T> *node = nodeStack.top();
+            current = nodeStack.top();
             nodeStack.pop();
-
-            for (auto it = node->childrens.rbegin(); it != node->childrens.rend(); ++it)
+            for (auto it = current->childrens.rbegin(); it != current->childrens.rend(); ++it)
             {
                 if (*it)
                 {
                     nodeStack.push(it->get());
                 }
             }
-
-            if (!nodeStack.empty())
-            {
-                current = nodeStack.top();
-            }
-            else
-            {
-                current = nullptr;
-            }
+        }
+        else
+        {
+            current = nullptr;
         }
         return *this;
     }
@@ -144,114 +145,94 @@ template <typename T>
 class post_order_iterator
 {
 private:
-    deque<Node<T> *> nodeQueue; ///< Queue to store nodes in post-order.
-    Node<T> *current;           ///< The current node in the traversal.
+    stack<Node<T> *> nodeStack;
+    Node<T> *current;
+    Node<T> *lastVisited;
     int k;
 
-
 public:
-    // root The root node of the tree to traverse.
-
-    post_order_iterator(Node<T> *root, int k) : current(root), k(k)
+    post_order_iterator(Node<T> *root, int k) : current(root), lastVisited(nullptr), k(k)
     {
         if (root)
         {
-            push_most_left_child(root);
+            pushLeftmostPath(root);
         }
     }
-    bool hasNext() const
-    {
-        return !nodeQueue.empty();
-    }
-    Node<T> *next()
-    {
-        if (nodeQueue.empty())
-        {
-            throw out_of_range("No more elements in iterator");
-        }
 
-        current = nodeQueue.front();
-        nodeQueue.pop_front();
+    Node<T> *operator->() const
+    {
         return current;
     }
-    void push_most_left_child(Node<T> *node)
+
+    T &operator*()
+    {
+        return current->value;
+    }
+
+    void pushLeftmostPath(Node<T> *node)
     {
         while (node)
         {
-            nodeQueue.push_front(node);
-            node = node->childrens.empty() ? nullptr : node->childrens.front().get();
-        }
-    }
-    post_order_iterator<T> &operator++()
-    {
-        if (k > 2) // if the tree is more than a binary tree i.e k-ary tree where as k>2 we will do dfs
-        {
-            Node<T> *Node = nodeQueue.front();
-            nodeQueue.pop_front();
-
-            for (auto it = Node->childrens.rbegin(); it != Node->childrens.rend(); ++it)
+            nodeStack.push(node);
+            if (!node->childrens.empty())
             {
-                if (*it)
-                {
-                    nodeQueue.push_front(it->get());
-                }
-            }
-
-            if (!nodeQueue.empty())
-            {
-                current = nodeQueue.front();
+                node = node->childrens[0].get();
             }
             else
             {
-                current = nullptr;
+                break;
             }
         }
-        else // if the tree is a binary tree we will do post-order traversal
+    }
+
+    post_order_iterator<T> &operator++()
+    {
+        if (nodeStack.empty())
         {
-             if (!nodeQueue.empty()) {
-                    Node<T>* node = nodeQueue.front();
-                    nodeQueue.pop_front();
-
-                    if (!nodeQueue.empty()) {
-                        Node<T>* parent = nodeQueue.front();
-                        bool isLastChild = false;
-                        for (size_t i = 0; i < parent->childrens.size(); ++i) {
-                            if (parent->childrens[i].get() == node && i == parent->childrens.size() - 1) {
-                                isLastChild = true;
-                                break;
-                            }
-                        }
-                        if (!isLastChild) {
-                            push_most_left_child(parent->childrens.back().get());
-                        }
-                    }
-
-                    current = node;
-                } else {
-                    current = nullptr;
+            current = nullptr;
+            return *this;
+        }
+        if (k > 2)
+        { // if k>2 we will do dfs
+            current = nodeStack.top();
+            nodeStack.pop();
+            for (auto it = current->childrens.rbegin(); it != current->childrens.rend(); ++it)
+            {
+                if (*it)
+                {
+                    nodeStack.push(it->get());
                 }
             }
             return *this;
         }
+        else
+        { // binary tree
+            Node<T> *top = nodeStack.top();
+            if (top->childrens.empty() || top->childrens.back().get() == lastVisited)
+            {
+                current = top;
+                nodeStack.pop();
+                lastVisited = current;
+            }
+            else
+            {
+                for (auto it = top->childrens.rbegin(); it != top->childrens.rend(); ++it)
+                {
+                    if (*it && it->get() != lastVisited)
+                    {
+                        pushLeftmostPath(it->get());
+                        break;
+                    }
+                }
+            }
 
-    T &operator*()
-    {
-        try
-        {
-            return current->value;
-        }
-        catch (const exception &e)
-        {
-            cerr << e.what() << '\n';
+            return *this;
         }
     }
+
     bool operator!=(const post_order_iterator &other) const
     {
         return (current != other.current);
-    }
-    Node<T> *get_current()
-    {
-        return current;
     }
 };
 
@@ -272,72 +253,51 @@ public:
             nodeStack.push(root);
         }
     }
-    Node<T> *get_current()
+
+    Node<T> *operator->() const
     {
         return current;
     }
 
     T &operator*()
     {
-        try
-        {
-            return current->value;
-        }
-        catch (const exception &e)
-        {
-            cerr << e.what() << '\n';
-        }
+        return current->value;
     }
 
     pre_order_iterator<T> &operator++()
     {
-        if (!nodeStack.empty())
+        if (nodeStack.empty())
         {
-            Node<T> *node = nodeStack.top();
-            nodeStack.pop();
-
-            if (k > 2) // if the tree is more than a binary tree i.e k-ary tree where as k>2 we will do dfs
-            {
-                for (auto it = node->childrens.rbegin(); it != node->childrens.rend(); ++it)
-                {
-                    if (*it)
-                    {
-                        nodeStack.push(it->get());
-                    }
-                }
-
-                if (!nodeStack.empty())
-                {
-                    current = nodeStack.top();
-                }
-                else
-                {
-                    current = nullptr;
-                }
-            }
-            else // if the tree is a binary tree
-            {
-                for (auto it = node->childrens.rbegin(); it != node->childrens.rend(); ++it)
-                {
-                    if (*it)
-                    {
-                        nodeStack.push(it->get());
-                    }
-                }
-
-                if (!nodeStack.empty())
-                {
-                    current = nodeStack.top();
-                }
-                else
-                {
-                    current = nullptr;
-                }
-            }
+            current = nullptr;
+            return *this;
         }
-        return *this;
+        if (k > 2)
+        { // if k>2 we will do dfs
+            current = nodeStack.top();
+            nodeStack.pop();
+            for (auto it = current->childrens.rbegin(); it != current->childrens.rend(); ++it)
+            {
+                if (*it)
+                {
+                    nodeStack.push(it->get());
+                }
+            }
+            return *this;
+        }
+        else // binary tree we will do pre-order
+        {
+            current = nodeStack.top();
+            nodeStack.pop();
+            for (auto it = current->childrens.rbegin(); it != current->childrens.rend(); ++it)
+            {
+                if (*it)
+                {
+                    nodeStack.push(it->get());
+                }
+            }
+            return *this;
+        }
     }
-
     bool operator!=(const pre_order_iterator &other) const
     {
         return (current != other.current);
@@ -352,78 +312,79 @@ private:
     stack<Node<T> *> nodeStack;
     Node<T> *current;
     int k;
+    unordered_set<Node<T> *> visited;
 
 public:
     in_order_iterator(Node<T> *root, int k) : current(root), k(k)
     {
-        push_most_left_child(root);
+        pushLeftmostPath(root);
     }
+
     bool operator!=(const in_order_iterator &other) const
     {
         return current != other.current;
     }
-    Node<T> *get_current()
+
+    Node<T> *operator->() const
     {
         return current;
     }
 
-    // Consider returning a sentinel value (e.g., nullptr) for end of iteration
     T &operator*()
     {
-        try
-        {
-            return current->value;
-        }
-        catch (const exception &e)
-        {
-            cerr << e.what() << '\n';
-        }
+        return current->value;
     }
-    void push_most_left_child(Node<T> *node)
+
+    void pushLeftmostPath(Node<T> *node)
     {
         while (node)
         {
             nodeStack.push(node);
-            node = node->childrens.empty() ? nullptr : node->childrens.front().get();
+            if (!node->childrens.empty())
+            {
+                node = node->childrens[0].get();
+            }
+            else
+            {
+                break;
+            }
         }
     }
 
     in_order_iterator<T> &operator++()
     {
-        if (!nodeStack.empty())
+        if (nodeStack.empty())
         {
+            current = nullptr;
+            return *this;
+        }
+        if (k > 2)
+        { // if k>2 we will do dfs
             current = nodeStack.top();
-            Node<T> *node = nodeStack.top();
             nodeStack.pop();
-
-            if (k > 2)
+            if (!current->childrens.empty())
             {
-                // if the tree is more than a binary tree i.e k-ary tree where as k>2 we will do dfs
-                {
-                    for (auto it = node->childrens.rbegin(); it != node->childrens.rend(); ++it)
-                    {
-                        if (*it)
-                        {
-                            nodeStack.push(it->get());
-                        }
-                    }
+                pushLeftmostPath(current->childrens[0].get());
+            }
+            return *this;
+        }
 
-                    if (!nodeStack.empty())
-                    {
-                        current = nodeStack.top();
-                    }
-                    else
-                    {
-                        current = nullptr;
-                    }
+        if (!current->childrens.empty() && !visited.count(current))
+        {
+            visited.insert(current);
+            for (auto it = current->childrens.rbegin(); it != current->childrens.rend(); ++it)
+            {
+                if (*it)
+                {
+                    nodeStack.push(it->get());
                 }
             }
-            else if (current->childrens.front())
-            { // Check for right child (binary tree)
-                push_most_left_child(current->childrens.front().get());
-            }
-            current = nodeStack.empty() ? nullptr : nodeStack.top();
+            return *this;
         }
+
+        current = nodeStack.top();
+        nodeStack.pop();
+
         return *this;
     }
 };
@@ -434,63 +395,67 @@ class HeapIterator
 {
 private:
     vector<Node<T> *> heap;
+    size_t index;
     int k;
-    int index;
 
 public:
-    HeapIterator(Node<T> *root, int k) :k(k)
+    HeapIterator(Node<T> *root, int k_) : index(0), k(k_)
     {
         if (k > 2)
         {
-            throw invalid_argument(" Heap is only for a binary tree! ");
+            throw invalid_argument("Heap iterator is only for binary trees");
         }
         if (root == nullptr)
         {
             return;
         }
-        heap.push_back(root);
-        index = 0;
-        
-        // put all the nodes in the tree in a vector
-        for (auto it = BFSIterator<T>(root,k); it != BFSIterator<T>(nullptr,k); ++it)
-        {
-            heap.push_back(it.get_current()); 
-        }
-        // make the vector a heap
-        make_heap(heap.begin(), heap.end(), [](Node<T> *a, Node<T>  *b){ return a->value > b->value; });
+        buildHeap(root);
     }
+
+    void buildHeap(Node<T> *root)
+    {
+        queue<Node<T> *> q;
+        q.push(root);
+        while (!q.empty())
+        {
+            Node<T> *node = q.front();
+            q.pop();
+            heap.push_back(node);
+            for (auto &child : node->childrens)
+            {
+                if (child)
+                {
+                    q.push(child.get());
+                }
+            }
+        }
+        make_heap(heap.begin(), heap.end(), [](Node<T> *a, Node<T> *b)
+                  { return a->value > b->value; });
+    }
+
     bool operator!=(const HeapIterator &other) const
     {
-        bool answer = !(*this == other);
-        return answer;
+        return index != other.index;
     }
 
-    T&operator*()
+    T &operator*()
     {
-        try{
-            return heap.at(index)->value;
-        }
-        catch (const exception &e)
-        {
-            cerr << e.what() << '\n';
-        }
+        return heap[0]->value;
     }
 
-    Node<T> *operator->()
+    Node<T> *operator->() const
     {
-        return heap.at(0);
+        return heap[0];
     }
 
     HeapIterator &operator++()
     {
-        pop_heap(heap.begin(), heap.end() - index, [](Node<T> *a, Node<T> *b)
-                      { return a->value > b->value; });
-        index++;
+        if (!heap.empty())
+        {
+            pop_heap(heap.begin(), heap.end(), [](Node<T> *a, Node<T> *b)
+                     { return a->value > b->value; });
+            heap.pop_back();
+        }
         return *this;
-    }
-
-    bool operator==(const HeapIterator &other) const
-    {
-        return heap.size() - index== other.heap.size() - other.index;
     }
 };

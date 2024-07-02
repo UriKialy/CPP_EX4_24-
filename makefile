@@ -1,6 +1,6 @@
 # Define the compiler and compiler flags
 CXX = g++
-CXXFLAGS = -g -std=c++14 -Wall -Wextra -I. -Wno-comment
+CXXFLAGS = -g -std=c++17 -Wall -Wextra -I. -Wno-comment
 
 # Define the target executable for the main program
 TREE = tree

@@ -22,8 +22,8 @@ int main()
     Node<int> *node7 = new Node<int>(7);
 
     binaryTree.add_root(root);
-    binaryTree.add_sub_node(root, node2);
     binaryTree.add_sub_node(root, node1);
+    binaryTree.add_sub_node(root, node2);
     binaryTree.add_sub_node(node1, node3);
     binaryTree.add_sub_node(node1, node4);
     binaryTree.add_sub_node(node2, node5);

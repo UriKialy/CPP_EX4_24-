@@ -35,30 +35,17 @@ public:
         }
         root = val;
     }
-    void add_sub_node(Node<T> *parent, Node<T> *child)
+     void add_sub_node(Node<T> *parent, Node<T> *child)
+{
+    if (parent->childrens.size() < (size_t)k)
     {
-        if (child == nullptr)
-        {
-            cout << "child is null" << endl;
-            return; // if there is no child nothing to do
-        }
-        if (parent->childrens.size() >= (size_t)k)
-        {
-            throw invalid_argument("Parent has max childrens");
-        }
-        if (parent == nullptr)
-        { // if there is no parent throw exception cause its invalid
-            throw invalid_argument("Parent doesn't exist");
-        }
-        if (root == nullptr)
-        {
-            throw invalid_argument("root doesn't exist");
-        }
-        else
-        {
-            parent->childrens.emplace_back(child); // add the child to the parent's childrens
-        }
+        parent->childrens.push_back(unique_ptr<Node<T>>(child));
     }
+    else
+    {
+        throw std::invalid_argument("Cannot add more children, k-ary limit reached");
+    }
+}
     int getK()
     {
         return k;
@@ -125,7 +112,7 @@ public:
         dfs_iterator<T> end = end_dfs_scan();
         while (it != end)
         {
-            cout<<"deleting node with value: "<<*it<<endl;
+            //cout<<"deleting node with value: "<<*it<<endl;
             prev = it;
             ++it;
             //prev.get_current()->remove_childrens();
