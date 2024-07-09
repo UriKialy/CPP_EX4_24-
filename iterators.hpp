@@ -27,6 +27,9 @@ public:
         }
         return nodeQueue.front()->value;
     }
+    Node<T>* get_node() const {
+        return nodeQueue.front();
+    }
 
     BFSIterator& operator++() {
         if (!nodeQueue.empty()) {
@@ -125,20 +128,15 @@ public:
 template <typename T>
 class in_order_iterator {
 private:
-    std::stack<std::pair<Node<T>*, bool>> nodeStack;
+    std::stack<Node<T>*> nodeStack;
+    Node<T>* current;
 
 public:
-    in_order_iterator(Node<T>* root, int k) {
-        if (root) {
-            pushLeftPath(root);
-        }
-    }
-
-    void pushLeftPath(Node<T>* node) {
-        while (node) {
-            nodeStack.push({node, false});
-            if (!node->childrens.empty()) {
-                node = node->childrens[0].get();
+    in_order_iterator(Node<T>* root, int k) : current(root) {
+        while (current) {
+            nodeStack.push(current);
+            if (!current->childrens.empty()) {
+                current = current->childrens[0].get();
             } else {
                 break;
             }
@@ -149,25 +147,26 @@ public:
         if (nodeStack.empty()) {
             throw std::out_of_range("In-order iterator is at end");
         }
-        return nodeStack.top().first->value;
+        return nodeStack.top()->value;
     }
 
     in_order_iterator<T>& operator++() {
-        if (nodeStack.empty()) {
-            return *this;
+        if (!nodeStack.empty()) {
+            Node<T>* node = nodeStack.top();
+            nodeStack.pop();
+
+            if (node->childrens.size() > 1) {
+                current = node->childrens[1].get();
+                while (current) {
+                    nodeStack.push(current);
+                    if (!current->childrens.empty()) {
+                        current = current->childrens[0].get();
+                    } else {
+                        break;
+                    }
+                }
+            }
         }
-
-        auto [node, visited] = nodeStack.top();
-        nodeStack.pop();
-
-        if (visited) {
-            return *this;
-        }
-
-        if (node->childrens.size() > 1) {
-            pushLeftPath(node->childrens[1].get());
-        }
-
         return *this;
     }
 
@@ -222,14 +221,11 @@ public:
 template <typename T>
 class HeapIterator {
 private:
-    std::vector<Node<T>*> heap;
-    size_t index;
+    std::vector<T> heap;
+    size_t currentIndex;
 
 public:
-    HeapIterator(Node<T>* root, int k) : index(0) {
-        if (k > 2) {
-            throw std::invalid_argument("Heap iterator is only for binary trees");
-        }
+    HeapIterator(Node<T>* root, int k) : currentIndex(0) {
         if (root != nullptr) {
             buildHeap(root);
         }
@@ -241,32 +237,30 @@ public:
         while (!q.empty()) {
             Node<T>* node = q.front();
             q.pop();
-            heap.push_back(node);
+            heap.push_back(node->value);
             for (auto& child : node->childrens) {
                 if (child) {
                     q.push(child.get());
                 }
             }
         }
-        std::make_heap(heap.begin(), heap.end(), [](Node<T>* a, Node<T>* b) { return a->value > b->value; });
+        std::sort(heap.begin(), heap.end());
     }
 
     bool operator!=(const HeapIterator& other) const {
-        return index != other.index || index < heap.size();
+        return currentIndex < heap.size();
     }
 
     T& operator*() {
-        if (index >= heap.size()) {
+        if (currentIndex >= heap.size()) {
             throw std::out_of_range("Heap iterator is at end");
         }
-        return heap[0]->value;
+        return heap[currentIndex];
     }
 
     HeapIterator& operator++() {
-        if (!heap.empty()) {
-            std::pop_heap(heap.begin(), heap.end(), [](Node<T>* a, Node<T>* b) { return a->value > b->value; });
-            heap.pop_back();
-            index++;
+        if (currentIndex < heap.size()) {
+            currentIndex++;
         }
         return *this;
     }

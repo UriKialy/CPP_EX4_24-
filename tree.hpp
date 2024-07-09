@@ -105,34 +105,22 @@ public:
         return HeapIterator<T>(nullptr, k);
     }
 
-    ~tree()=default;
+    ~tree(){
+        deleteTree(root);
+    }
 
-//    ~tree()
-// {
-//     if (!root) return;
-
-//     cout << "Starting tree deletion" << endl;
-//     vector<Node<T>*> nodes_to_delete;
-
-//     // Collect nodes in BFS order
-//     BFSIterator<T> it = begin_bfs_scan();
-//     BFSIterator<T> end = end_bfs_scan();
-//     while (it != end)
-//     {
-//         nodes_to_delete.push_back(*it);
-//         ++it;
-//     }
-
-//     // Delete nodes in reverse order
-//     for (auto it = nodes_to_delete.rbegin(); it != nodes_to_delete.rend(); ++it)
-//     {
-//         (*it)->remove_childrens();
-//         delete *it;
-//     }
-
-//     root = nullptr;
-//     cout << "Tree deletion complete" << endl;
-// }
+void deleteTree(Node<T>* node) {
+    if (node) {
+        // First delete all children recursively
+        for (auto& child : node->childrens) {
+            deleteTree(child.release());
+        }
+        // Then delete the node itself
+        delete node;
+    }
+}
+    
+    
     // Template function to draw the tree nodes and edges
     void drawTreeNodes_Edges(sf::RenderWindow &window, Node<T> *node, sf::Vector2f position, float horizontalSpacing, float verticalSpacing)
     {
