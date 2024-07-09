@@ -18,7 +18,6 @@ int main()
     Node<int> *node4 = new Node<int>(4);
     Node<int> *node5 = new Node<int>(5);
     Node<int> *node6 = new Node<int>(6);
-    Node<int> *node7 = new Node<int>(7);
 
     binaryTree.add_root(root);
     binaryTree.add_sub_node(root, node1);
@@ -27,7 +26,6 @@ int main()
     binaryTree.add_sub_node(node1, node4);
     binaryTree.add_sub_node(node2, node5);
     binaryTree.add_sub_node(node2, node6);
-    binaryTree.add_sub_node(node3, node7);
 
     cout << "Pre-order Traversal (Binary Tree): ";
     for (auto it = binaryTree.begin_pre_order(); it != binaryTree.end_pre_order(); ++it)
@@ -74,7 +72,6 @@ int main()
     Node<Complex> *nodeC4 = new Node<Complex>(Complex(4, 4));
     Node<Complex> *nodeC5 = new Node<Complex>(Complex(5, 5));
     Node<Complex> *nodeC6 = new Node<Complex>(Complex(6, 6));
-    Node<Complex> *nodeC7 = new Node<Complex>(Complex(7, 7));
 
     binaryComplexTree.add_root(ComplexRoot);
     binaryComplexTree.add_sub_node(ComplexRoot, nodeC1);
@@ -83,7 +80,6 @@ int main()
     binaryComplexTree.add_sub_node(nodeC1, nodeC4);
     binaryComplexTree.add_sub_node(nodeC2, nodeC5);
     binaryComplexTree.add_sub_node(nodeC2, nodeC6);
-    binaryComplexTree.add_sub_node(nodeC3, nodeC7);
 
     cout << "Pre-order Traversal (Binary Complex Tree): ";
     for (auto it = binaryComplexTree.begin_pre_order(); it != binaryComplexTree.end_pre_order(); ++it)
@@ -132,7 +128,6 @@ int main()
     Node<int> *nodeT7 = new Node<int>(7);
     Node<int> *nodeT8 = new Node<int>(8);
     Node<int> *nodeT9 = new Node<int>(9);
-    Node<int> *nodeT10 = new Node<int>(10);
 
     threeAryTree.add_root(Troot);
     threeAryTree.add_sub_node(Troot, nodeT2);
@@ -143,7 +138,6 @@ int main()
     threeAryTree.add_sub_node(nodeT3, nodeT7);
     threeAryTree.add_sub_node(nodeT3, nodeT8);
     threeAryTree.add_sub_node(nodeT4, nodeT9);
-    threeAryTree.add_sub_node(nodeT4, nodeT10);
 
     cout << "Pre-order Traversal (k-3 Tree): ";
     for (auto it = threeAryTree.begin_pre_order(); it != threeAryTree.end_pre_order(); ++it)

@@ -124,21 +124,18 @@ public:
         return !nodeStack.empty() || !other.nodeStack.empty();
     }
 };
-
 template <typename T>
 class in_order_iterator {
 private:
-    std::stack<Node<T>*> nodeStack;
-    Node<T>* current;
+    std::stack<std::pair<Node<T>*, size_t>> nodeStack;
+    int k;
 
 public:
-    in_order_iterator(Node<T>* root, int k) : current(root) {
-        while (current) {
-            nodeStack.push(current);
-            if (!current->childrens.empty()) {
-                current = current->childrens[0].get();
-            } else {
-                break;
+    in_order_iterator(Node<T>* root, int k) : k(k) {
+        if (root) {
+            nodeStack.push({root, 0});
+            if (k <= 2) {
+                moveToFirstInOrder();
             }
         }
     }
@@ -147,24 +144,15 @@ public:
         if (nodeStack.empty()) {
             throw std::out_of_range("In-order iterator is at end");
         }
-        return nodeStack.top()->value;
+        return nodeStack.top().first->value;
     }
 
     in_order_iterator<T>& operator++() {
         if (!nodeStack.empty()) {
-            Node<T>* node = nodeStack.top();
-            nodeStack.pop();
-
-            if (node->childrens.size() > 1) {
-                current = node->childrens[1].get();
-                while (current) {
-                    nodeStack.push(current);
-                    if (!current->childrens.empty()) {
-                        current = current->childrens[0].get();
-                    } else {
-                        break;
-                    }
-                }
+            if (k <= 2) {
+                moveNextInOrder();
+            } else {
+                moveNextDFS();
             }
         }
         return *this;
@@ -173,17 +161,50 @@ public:
     bool operator!=(const in_order_iterator& other) const {
         return !nodeStack.empty() || !other.nodeStack.empty();
     }
-};
 
+private:
+    void moveToFirstInOrder() {
+        while (!nodeStack.empty()) {
+            auto [node, index] = nodeStack.top();
+            if (index == 0 && !node->childrens.empty()) {
+                nodeStack.push({node->childrens[0].get(), 0});
+            } else {
+                break;
+            }
+        }
+    }
+
+    void moveNextInOrder() {
+        auto [node, index] = nodeStack.top();
+        nodeStack.pop();
+
+        if (index + 1 < node->childrens.size()) {
+            nodeStack.push({node->childrens[index + 1].get(), 0});
+            moveToFirstInOrder();
+        }
+    }
+
+    void moveNextDFS() {
+        auto [node, index] = nodeStack.top();
+        nodeStack.pop();
+
+        for (auto it = node->childrens.rbegin(); it != node->childrens.rend(); ++it) {
+            if (*it) {
+                nodeStack.push({it->get(), 0});
+            }
+        }
+    }
+};
 template <typename T>
 class post_order_iterator {
 private:
-    std::stack<std::pair<Node<T>*, bool>> nodeStack;
+    std::stack<Node<T>*> nodeStack;
+    int k;
 
 public:
-    post_order_iterator(Node<T>* root, int k) {
+    post_order_iterator(Node<T>* root, int k) : k(k) {
         if (root) {
-            nodeStack.push({root, false});
+            nodeStack.push(root);
         }
     }
 
@@ -191,21 +212,27 @@ public:
         if (nodeStack.empty()) {
             throw std::out_of_range("Post-order iterator is at end");
         }
-        return nodeStack.top().first->value;
+        return nodeStack.top()->value;
     }
 
     post_order_iterator<T>& operator++() {
-        while (!nodeStack.empty()) {
-            auto [node, visited] = nodeStack.top();
+        if (!nodeStack.empty()) {
+            Node<T>* current = nodeStack.top();
             nodeStack.pop();
 
-            if (visited) {
-                return *this;
-            } else {
-                nodeStack.push({node, true});
-                for (auto it = node->childrens.rbegin(); it != node->childrens.rend(); ++it) {
+            if (k > 2) {
+                // For k > 2, use DFS-like traversal
+                for (auto it = current->childrens.rbegin(); it != current->childrens.rend(); ++it) {
                     if (*it) {
-                        nodeStack.push({it->get(), false});
+                        nodeStack.push(it->get());
+                    }
+                }
+            } else {
+                // For k <= 2, use traditional post-order traversal
+                if (!current->childrens.empty()) {
+                    nodeStack.push(current->childrens[0].get());
+                    if (current->childrens.size() > 1) {
+                        nodeStack.push(current->childrens[1].get());
                     }
                 }
             }
