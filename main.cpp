@@ -1,16 +1,15 @@
 #include "Node.hpp"
 #include <iostream>
-using namespace std;
 #include "tree.hpp"
 #include "iterators.hpp"
 #include <SFML/Graphics.hpp>
 #include <cmath>
 #include <sstream>
 #include "Complex.hpp"
+using namespace std;
 
 int main()
-{
-    // Create a binary tree with integers
+{    // Create a binary tree with integers
     tree<int> binaryTree(2);
     Node<int> *root = new Node<int>(555);
     Node<int> *node1 = new Node<int>(1);
@@ -78,11 +77,12 @@ int main()
     Node<Complex> *nodeC7 = new Node<Complex>(Complex(7, 7));
 
     binaryComplexTree.add_root(ComplexRoot);
-    binaryComplexTree.add_sub_node(nodeC1, nodeC2);
+    binaryComplexTree.add_sub_node(ComplexRoot, nodeC1);
+    binaryComplexTree.add_sub_node(ComplexRoot, nodeC2);
     binaryComplexTree.add_sub_node(nodeC1, nodeC3);
-    binaryComplexTree.add_sub_node(nodeC2, nodeC4);
+    binaryComplexTree.add_sub_node(nodeC1, nodeC4);
     binaryComplexTree.add_sub_node(nodeC2, nodeC5);
-    binaryComplexTree.add_sub_node(nodeC3, nodeC6);
+    binaryComplexTree.add_sub_node(nodeC2, nodeC6);
     binaryComplexTree.add_sub_node(nodeC3, nodeC7);
 
     cout << "Pre-order Traversal (Binary Complex Tree): ";
@@ -122,11 +122,8 @@ int main()
 
     // Create a k-3 tree with integers
     tree<int> threeAryTree(3);
-    // Tree<Complex> binaryComplexTree;
-
     
     Node<int> *Troot = new Node<int>(1);
-    Node<int> *nodeT1 = new Node<int>(1);
     Node<int> *nodeT2 = new Node<int>(2);
     Node<int> *nodeT3 = new Node<int>(3);
     Node<int> *nodeT4 = new Node<int>(4);
@@ -138,9 +135,9 @@ int main()
     Node<int> *nodeT10 = new Node<int>(10);
 
     threeAryTree.add_root(Troot);
-    threeAryTree.add_sub_node(nodeT1, nodeT2);
-    threeAryTree.add_sub_node(nodeT1, nodeT3);
-    threeAryTree.add_sub_node(nodeT1, nodeT4);
+    threeAryTree.add_sub_node(Troot, nodeT2);
+    threeAryTree.add_sub_node(Troot, nodeT3);
+    threeAryTree.add_sub_node(Troot, nodeT4);
     threeAryTree.add_sub_node(nodeT2, nodeT5);
     threeAryTree.add_sub_node(nodeT2, nodeT6);
     threeAryTree.add_sub_node(nodeT3, nodeT7);

@@ -35,17 +35,17 @@ public:
         }
         root = val;
     }
-     void add_sub_node(Node<T> *parent, Node<T> *child)
-{
-    if (parent->childrens.size() < (size_t)k)
+    void add_sub_node(Node<T> *parent, Node<T> *child)
     {
-        parent->childrens.push_back(unique_ptr<Node<T>>(child));
+        if (parent->childrens.size() < (size_t)k)
+        {
+            parent->childrens.push_back(unique_ptr<Node<T>>(child));
+        }
+        else
+        {
+            throw invalid_argument("Cannot add more children, k-ary limit reached");
+        }
     }
-    else
-    {
-        throw std::invalid_argument("Cannot add more children, k-ary limit reached");
-    }
-}
     int getK()
     {
         return k;
@@ -79,12 +79,12 @@ public:
 
     dfs_iterator<T> begin_dfs_scan()
     {
-        return dfs_iterator<T>(root, k);
+        return dfs_iterator<T>(root);
     }
 
     dfs_iterator<T> end_dfs_scan()
     {
-        return dfs_iterator<T>(nullptr, k);
+        return dfs_iterator<T>(nullptr);
     }
 
     BFSIterator<T> begin_bfs_scan()
@@ -105,22 +105,34 @@ public:
         return HeapIterator<T>(nullptr, k);
     }
 
-    ~tree()
-    {
-        dfs_iterator<T> it = begin_dfs_scan();
-        dfs_iterator<T> prev = it;
-        dfs_iterator<T> end = end_dfs_scan();
-        while (it != end)
-        {
-            //cout<<"deleting node with value: "<<*it<<endl;
-            prev = it;
-            ++it;
-            //prev.get_current()->remove_childrens();
-        }
-        root = nullptr;
-    }
-    
+    ~tree()=default;
 
+//    ~tree()
+// {
+//     if (!root) return;
+
+//     cout << "Starting tree deletion" << endl;
+//     vector<Node<T>*> nodes_to_delete;
+
+//     // Collect nodes in BFS order
+//     BFSIterator<T> it = begin_bfs_scan();
+//     BFSIterator<T> end = end_bfs_scan();
+//     while (it != end)
+//     {
+//         nodes_to_delete.push_back(*it);
+//         ++it;
+//     }
+
+//     // Delete nodes in reverse order
+//     for (auto it = nodes_to_delete.rbegin(); it != nodes_to_delete.rend(); ++it)
+//     {
+//         (*it)->remove_childrens();
+//         delete *it;
+//     }
+
+//     root = nullptr;
+//     cout << "Tree deletion complete" << endl;
+// }
     // Template function to draw the tree nodes and edges
     void drawTreeNodes_Edges(sf::RenderWindow &window, Node<T> *node, sf::Vector2f position, float horizontalSpacing, float verticalSpacing)
     {

@@ -15,7 +15,9 @@ public:
     T value;
     vector<unique_ptr<Node<T>>> childrens;
     Node(T val) : value(val) { }
-        void remove_childrens() {
+   
+    void   remove_childrens()
+    {
         childrens.clear();
     }
 };
