@@ -129,7 +129,7 @@ void deleteTree(Node<T>* node) {
 
         int childSize = node->childrens.size();
         float startAngle = -90.0f - (childSize - 1) * 15.0f;
-        sf::CircleShape circle(20);
+        sf::CircleShape circle(30);
         circle.setFillColor(sf::Color(100, 100, 255));
         circle.setPosition(position.x - circle.getRadius(), position.y - circle.getRadius());
         window.draw(circle);

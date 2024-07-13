@@ -13,11 +13,15 @@ template <typename T>
 class BFSIterator {
 private:
     std::queue<Node<T>*> nodeQueue;
+    int k;
 
 public:
-    BFSIterator(Node<T>* root, int k) {
+    BFSIterator(Node<T>* root, int k) : k(k){
+        if(k<=0){
+            throw std::invalid_argument("k must be greater than 0");
+        }
         if (root != nullptr) {
-            nodeQueue.push(root);
+            nodeQueue.push(root);//push the root node to the queue
         }
     }
 
@@ -25,7 +29,7 @@ public:
         if (nodeQueue.empty()) {
             throw std::out_of_range("BFS iterator is at end");
         }
-        return nodeQueue.front()->value;
+        return nodeQueue.front()->value;//return the value of the front node
     }
     Node<T>* get_node() const {
         return nodeQueue.front();
@@ -91,9 +95,10 @@ template <typename T>
 class pre_order_iterator {
 private:
     std::stack<Node<T>*> nodeStack;
+    int k;
 
 public:
-    pre_order_iterator(Node<T>* root, int k) {
+    pre_order_iterator(Node<T>* root, int k) : k(k){
         if (root) {
             nodeStack.push(root);
         }
@@ -107,6 +112,18 @@ public:
     }
 
     pre_order_iterator& operator++() {
+        if(k>2){// For k > 2, use DFS-like traversal
+            if (!nodeStack.empty()) {
+            Node<T>* curr = nodeStack.top();
+            nodeStack.pop();
+
+            for (auto it = curr->childrens.rbegin(); it != curr->childrens.rend(); ++it) {
+                if (*it) {
+                    nodeStack.push(it->get());
+                }
+            }
+        }
+        }
         if (!nodeStack.empty()) {
             Node<T>* current = nodeStack.top();
             nodeStack.pop();
@@ -253,10 +270,14 @@ private:
 
 public:
     HeapIterator(Node<T>* root, int k) : currentIndex(0) {
+        if(k>2){
+            throw std::invalid_argument("Heap iterator is only for k <= 2");
+        }
         if (root != nullptr) {
             buildHeap(root);
         }
     }
+
 
     void buildHeap(Node<T>* root) {
         std::queue<Node<T>*> q;
@@ -275,7 +296,7 @@ public:
     }
 
     bool operator!=(const HeapIterator& other) const {
-        return currentIndex < heap.size();
+    return this->currentIndex != other.currentIndex;
     }
 
     T& operator*() {

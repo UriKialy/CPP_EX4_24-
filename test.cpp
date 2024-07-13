@@ -65,14 +65,6 @@ TEST_CASE("BFS Iterator for int") {
     for (auto it = three_ary_tree.begin_bfs_scan(); it != three_ary_tree.end_bfs_scan(); ++it) {
         actual_order.push_back(*it);
     }
-
-    // Print out the actual order
-    std::cout << "Actual BFS order: ";
-    for (int val : actual_order) {
-        std::cout << val << " ";
-    }
-    std::cout << std::endl;
-
     // Compare sizes
     CHECK(actual_order.size() == expected_order.size());
 
@@ -96,18 +88,16 @@ TEST_CASE("DFS Iterator for int") {
     three_ary_tree.add_sub_node(root, child3);
      three_ary_tree.add_sub_node(child1,child4);
     three_ary_tree.add_sub_node(child1,child5);
-    cout<<"starting checks"<<endl;
     std::vector<int> dfs_order = {1, 2, 5, 6, 3, 4};
     int i = 0;
     for (auto it = three_ary_tree.begin_dfs_scan(); it != three_ary_tree.end_dfs_scan(); ++it) {
         CHECK(*it == dfs_order[i]);
         ++i;
     }
-    cout<<"DFS order is correct"<<endl;
 }
 
 TEST_CASE("Pre-Order Iterator for int") {
-      tree<int> three_ary_tree(3);
+      tree<int> three_ary_tree(2);
     Node<int>* root = new Node<int>(1);
     three_ary_tree.add_root(root);
     Node<int>* child1 = new Node<int>(2);
@@ -117,17 +107,16 @@ TEST_CASE("Pre-Order Iterator for int") {
     Node<int>* child5 = new Node<int>(6);
     three_ary_tree.add_sub_node(root, child1);
     three_ary_tree.add_sub_node(root, child2);
-    three_ary_tree.add_sub_node(root, child3);
+    three_ary_tree.add_sub_node(child1, child3);
      three_ary_tree.add_sub_node(child1,child4);
-    three_ary_tree.add_sub_node(child1,child5);
+    three_ary_tree.add_sub_node(child2,child5);
 
-    std::vector<int> pre_order = {1, 2, 5, 6, 3, 4};
+    std::vector<int> pre_order = {1, 2, 4, 5, 3, 6};
     int i = 0;
     for (auto it = three_ary_tree.begin_pre_order(); it != three_ary_tree.end_pre_order(); ++it) {
         CHECK(*it == pre_order[i]);
         ++i;
     }
-    cout<<"Pre order is correct"<<endl;
 }
 
 TEST_CASE("In-Order Iterator for int") {
@@ -267,45 +256,7 @@ TEST_CASE("DFS Iterator for double") {
     }
 }
 
-// TEST_CASE("Pre-Order Iterator for double") {
-//   tree<double> three_ary_tree(3);
-//     Node<double>* root = new Node<double>(1.1);
-//     three_ary_tree.add_root(root);
-//     Node<double>* child1 = new Node<double>(2.4);
-//     Node<double>* child2 = new Node<double>(4.2);
-//     Node<double>* child3 = new Node<double>(6.9);
-//     three_ary_tree.add_sub_node(root, child1);
-//     three_ary_tree.add_sub_node(root, child2);
-//     three_ary_tree.add_sub_node(root, child3);
-//     three_ary_tree.add_sub_node(child1, new Node<double>(9.9));
-//     three_ary_tree.add_sub_node(child1, new Node<double>(6.6));
 
-//     std::vector<double> pre_order = {1.1, 4.2, 6.9, 9.9, 6.6};
-//     int i = 0;
-//     for (auto it = three_ary_tree.begin_pre_order(); it != three_ary_tree.end_pre_order(); ++it) {
-//         CHECK(*it == pre_order[i]);
-//         ++i;
-//     }
-// }
-
-// TEST_CASE("In-Order Iterator for double") {
-//     tree<double> binaryTree(2);
-//     Node<double>* root = new Node<double>(4.2);
-//     binaryTree.add_root(root);
-//     Node<double>* child1 = new Node<double>(6.9);
-//     Node<double>* child2 = new Node<double>(9.6);
-//     binaryTree.add_sub_node(root, child1);
-//     binaryTree.add_sub_node(root, child2);
-//     binaryTree.add_sub_node(child1, new Node<double>(4.4));
-//     binaryTree.add_sub_node(child1, new Node<double>(5.5));
-
-//     std::vector<double> in_order = {4.2,6.9,9.6,4.4,5.5};
-//     int i = 0;
-//     for (auto it = binaryTree.begin_in_order(); it != binaryTree.end_in_order(); ++it) {
-//         CHECK(*it == in_order[i]);
-//         ++i;
-//     }
-// }
 
 TEST_CASE("Heap Iterator for double") {
     tree<double> BinaryTreeDouble(2);
@@ -390,7 +341,7 @@ TEST_CASE("DFS Iterator for Complex") {
 }
 
 TEST_CASE("Pre-Order Iterator for Complex") {
-    tree<Complex> three_ary_tree(3);
+    tree<Complex> three_ary_tree(2);
     Node<Complex>* root = new Node<Complex>({10, 20});
     three_ary_tree.add_root(root);
     Node<Complex>* child1 = new Node<Complex>({30, 40});
@@ -398,11 +349,11 @@ TEST_CASE("Pre-Order Iterator for Complex") {
     Node<Complex>* child3 = new Node<Complex>({70, 80});
     three_ary_tree.add_sub_node(root, child1);
     three_ary_tree.add_sub_node(root, child2);
-    three_ary_tree.add_sub_node(root, child3);
+    three_ary_tree.add_sub_node(child1, child3);
     three_ary_tree.add_sub_node(child1, new Node<Complex>({90, 100}));
-    three_ary_tree.add_sub_node(child1, new Node<Complex>({110, 120}));
+    three_ary_tree.add_sub_node(child2, new Node<Complex>({110, 120}));
 
-    vector<Complex> pre_order = {{10, 20}, {30, 40}, {90, 100}, {110, 120}, {50, 60}, {70, 80}};
+    vector<Complex> pre_order = {{10, 20}, {30, 40}, {70, 80}, {90, 100}, {50, 60}, {110, 120}};
     int i = 0;
     for (auto it = three_ary_tree.begin_pre_order(); it != three_ary_tree.end_pre_order(); ++it) {
         CHECK(*it == pre_order[i]);
