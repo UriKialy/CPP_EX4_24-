@@ -42,7 +42,7 @@ bool Complex::operator>(const Complex &other) const
 }
 bool Complex::operator<(const Complex &other) const
 {
-    return (real < other.real) && (imag < other.imag);
+    return (!(*this > other)&& !(*this == other));
 }
 
 ostream &operator<<(ostream &out, const Complex &c)

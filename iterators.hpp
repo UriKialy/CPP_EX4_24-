@@ -124,6 +124,7 @@ public:
             }
         }
         }
+        else{
         if (!nodeStack.empty()) {
             Node<T>* current = nodeStack.top();
             nodeStack.pop();
@@ -134,6 +135,7 @@ public:
                 }
             }
         }
+    }
         return *this;
     }
 

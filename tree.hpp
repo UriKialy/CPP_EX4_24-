@@ -12,10 +12,7 @@
 #include <SFML/Graphics.hpp>
 #include <cmath>
 #include <sstream>
-// export CPLUS_INCLUDE_PATH=/path/to/QGraphicsScene
-// #include <QGraphicsEllipseItem>
-// #include <QGraphicsTextItem>
-// #include "complex.hpp"
+#include "Complex.hpp"
 using namespace std;
 
 template <typename T>
